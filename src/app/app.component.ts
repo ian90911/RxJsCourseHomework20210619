@@ -17,9 +17,12 @@ export class AppComponent implements OnInit {
   ngOnInit() {}
 
   start() {
-    this.subscription = this.milisecond$.subscribe({
-      next: data => this.updateSecond(data)
-    });
+    if(this.subscription === undefined 
+      || this.subscription.closed){
+      this.subscription = this.milisecond$.subscribe({
+        next: data => this.updateSecond(data)
+      });
+    }
   }
 
   pause() {
