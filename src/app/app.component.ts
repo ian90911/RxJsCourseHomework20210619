@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { interval } from 'rxjs';
+import { interval, Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'my-app',
@@ -12,22 +12,25 @@ export class AppComponent implements OnInit {
   oddLapTimes = [10.2, 35.9, 55];
   evenLapTimes = [20.7, 48.1, 77.4];
   milisecond$ = interval(100);
+  subscription:Subscription;
 
   ngOnInit() {}
 
   start() {
-    this.milisecond$.subscribe({
+    this.subscription = this.milisecond$.subscribe({
       next: data => this.updateSecond(data)
     });
   }
 
-  pause() {}
+  pause() {
+    this.subscription.unsubscribe();
+  }
 
   stop() {}
 
   divide() {}
 
   updateSecond(data: number) {
-    this.second = data / 10;
+    this.second += 0.1;
   }
 }
