@@ -12,13 +12,17 @@ export class AppComponent implements OnInit {
   oddLapTimes = [10.2, 35.9, 55];
   evenLapTimes = [20.7, 48.1, 77.4];
   milisecond$ = interval(100);
-  subscription:Subscription;
+  subscription: Subscription;
+  stopped: boolean;
 
   ngOnInit() {}
 
   start() {
-    if(this.subscription === undefined 
-      || this.subscription.closed){
+    if (this.subscription === undefined || this.subscription.closed) {
+      if (this.stopped) {
+        this.second = 0.0;
+        this.stopped = false;
+      }
       this.subscription = this.milisecond$.subscribe({
         next: data => this.updateSecond(data)
       });
@@ -29,7 +33,10 @@ export class AppComponent implements OnInit {
     this.subscription.unsubscribe();
   }
 
-  stop() {}
+  stop() {
+    this.stopped = true;
+    this.subscription.unsubscribe();
+  }
 
   divide() {}
 
