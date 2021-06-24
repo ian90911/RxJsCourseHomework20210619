@@ -8,7 +8,7 @@ import { interval, Observable, Subscription } from 'rxjs';
 })
 export class AppComponent implements OnInit {
   second = 0.0;
-  totalLapTimes = [10.2, 20.7, 35.9, 48.1, 55, 77.4];
+  totalLapTimes = [];
   oddLapTimes = [10.2, 35.9, 55];
   evenLapTimes = [20.7, 48.1, 77.4];
   milisecond$ = interval(100);
@@ -38,7 +38,9 @@ export class AppComponent implements OnInit {
     this.subscription.unsubscribe();
   }
 
-  divide() {}
+  divide() {
+    if (this.second > 0) this.totalLapTimes.push(this.second);
+  }
 
   updateSecond(data: number) {
     this.second += 0.1;
