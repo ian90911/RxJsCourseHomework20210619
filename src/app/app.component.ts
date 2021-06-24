@@ -9,11 +9,12 @@ import { interval, Observable, Subscription } from 'rxjs';
 export class AppComponent implements OnInit {
   second = 0.0;
   totalLapTimes = [];
-  oddLapTimes = [10.2, 35.9, 55];
-  evenLapTimes = [20.7, 48.1, 77.4];
+  oddLapTimes = [];
+  evenLapTimes = [];
   milisecond$ = interval(100);
   subscription: Subscription;
   stopped: boolean;
+  counter: number = 0;
 
   ngOnInit() {}
 
@@ -39,7 +40,18 @@ export class AppComponent implements OnInit {
   }
 
   divide() {
-    if (this.second > 0) this.totalLapTimes.push(this.second);
+    if (this.second > 0) {
+      this.totalLapTimes.push(this.second);
+      switch (this.counter % 2) {
+        case 0:
+          this.oddLapTimes.push(this.second);
+          break;
+        case 1:
+          this.evenLapTimes.push(this.second);
+          break;
+      }
+      this.counter++;
+    }
   }
 
   updateSecond(data: number) {
