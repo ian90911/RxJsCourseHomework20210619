@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { BehaviorSubject, interval, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, from, interval, partition, Subject, Subscription  } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 
 @Component({
   selector: 'my-app',
@@ -14,15 +15,37 @@ export class AppComponent implements OnInit {
   milisecond$ = interval(100);
   subscription: Subscription;
   stopped: boolean;
-  counter: number = 0;
+  lapTime$ = new Subject<number>();
+  oddSubscription: Subscription;
+  evenSubscription: Subscription;
 
-  ngOnInit() {}
+  ngOnInit() {
+    const mapLapTime$ = this.lapTime$.pipe(
+      map((data,index)=>{
+        return {data:data,index:index+1}
+      })
+    );
+
+    const parts = partition(mapLapTime$,
+      data=>data.index %2 ===0);
+
+    this.evenSubscription = parts[0].subscribe({
+      next:data=>this.evenLapTimes.push(data.data)
+    });
+
+    this.oddSubscription = parts[1].subscribe({
+      next:data=>this.oddLapTimes.push(data.data)
+    });
+  }
 
   start() {
     if (this.subscription === undefined || this.subscription.closed) {
       if (this.stopped) {
         this.second = new BehaviorSubject(0);
         this.stopped = false;
+        this.oddLapTimes = [];
+        this.evenLapTimes = [];
+        this.totalLapTimes = [];
       }
       this.subscription = this.milisecond$.subscribe({
         next: data => this.second.next(this.second.value + 0.1)
@@ -42,15 +65,7 @@ export class AppComponent implements OnInit {
   divide() {
     if (this.second.value > 0) {
       this.totalLapTimes.push(this.second.value);
-      switch (this.counter % 2) {
-        case 0:
-          this.oddLapTimes.push(this.second.value);
-          break;
-        case 1:
-          this.evenLapTimes.push(this.second.value);
-          break;
-      }
-      this.counter++;
+      this.lapTime$.next(this.second.value)
     }
   }
 
