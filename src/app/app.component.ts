@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { interval, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, interval, Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'my-app',
@@ -7,7 +7,7 @@ import { interval, Observable, Subscription } from 'rxjs';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  second = 0.0;
+  second: BehaviorSubject<number> = new BehaviorSubject(0);
   totalLapTimes = [];
   oddLapTimes = [];
   evenLapTimes = [];
@@ -21,11 +21,11 @@ export class AppComponent implements OnInit {
   start() {
     if (this.subscription === undefined || this.subscription.closed) {
       if (this.stopped) {
-        this.second = 0.0;
+        this.second = new BehaviorSubject(0);
         this.stopped = false;
       }
       this.subscription = this.milisecond$.subscribe({
-        next: data => this.updateSecond(data)
+        next: data => this.second.next(this.second.value + 0.1)
       });
     }
   }
@@ -40,21 +40,18 @@ export class AppComponent implements OnInit {
   }
 
   divide() {
-    if (this.second > 0) {
-      this.totalLapTimes.push(this.second);
+    if (this.second.value > 0) {
+      this.totalLapTimes.push(this.second.value);
       switch (this.counter % 2) {
         case 0:
-          this.oddLapTimes.push(this.second);
+          this.oddLapTimes.push(this.second.value);
           break;
         case 1:
-          this.evenLapTimes.push(this.second);
+          this.evenLapTimes.push(this.second.value);
           break;
       }
       this.counter++;
     }
   }
 
-  updateSecond(data: number) {
-    this.second += 0.1;
-  }
 }
